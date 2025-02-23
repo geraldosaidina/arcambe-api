@@ -1,0 +1,87 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id              Int       @id @default(autoincrement())
+  name            String
+  email           String    @unique
+  password        String
+  userType        String    // seller, buyer, partner
+  company         String?   // for sellers
+  residueTypes    String?   // for sellers
+  wastes        Waste[]
+  Advertisement   Advertisement[]
+  sentMessages    Message[] @relation("SentMessages")
+  receivedMessages Message[] @relation("ReceivedMessages")
+  locations       Location[]
+  transactionsAsBuyer Transaction[] @relation("BuyerTransactions")
+  transactionsAsSeller Transaction[] @relation("SellerTransactions")
+}
+
+model Waste {
+  id              Int       @id @default(autoincrement())
+  name            String
+  type            String
+  quantity        Int
+  characteristics String
+  price           Float
+  userId          Int
+  user            User      @relation(fields: [userId], references: [id])
+  advertisements   Advertisement[]
+}
+
+model Advertisement {
+  id              Int       @id @default(autoincrement())
+  title           String
+  description     String
+  createdAt       DateTime  @default(now())
+  userId          Int
+  residueId       Int
+  user            User      @relation(fields: [userId], references: [id])
+  waste         Waste   @relation(fields: [residueId], references: [id])
+}
+
+model Transaction {
+  id              Int       @id @default(autoincrement())
+  date            DateTime  @default(now())
+  totalAmount     Float
+  status          String    // pending, completed, canceled
+  buyerId         Int
+  sellerId        Int
+  buyer           User      @relation("BuyerTransactions", fields: [buyerId], references: [id])
+  seller          User      @relation("SellerTransactions", fields: [sellerId], references: [id])
+  payments        Payment[]
+}
+
+model Payment {
+  id              Int       @id @default(autoincrement())
+  paymentMethod   String
+  date            DateTime  @default(now())
+  status          String
+  transactionId   Int
+  transaction     Transaction @relation(fields: [transactionId], references: [id])
+}
+
+model Location {
+  id              Int       @id @default(autoincrement())
+  latitude        Float
+  longitude       Float
+  userId          Int
+  user            User      @relation(fields: [userId], references: [id])
+}
+
+model Message {
+  id              Int       @id @default(autoincrement())
+  text            String
+  sentAt          DateTime  @default(now())
+  senderId        Int
+  receiverId      Int
+  sender          User      @relation("SentMessages", fields: [senderId], references: [id])
+  receiver        User      @relation("ReceivedMessages", fields: [receiverId], references: [id])
+}
