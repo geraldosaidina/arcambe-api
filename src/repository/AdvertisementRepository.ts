@@ -1,7 +1,7 @@
 import { Advertisement } from "@prisma/client";
 import prisma from "../providers/prisma/client";
 
-export const createAnnouncement = async (advertisementData: Omit<Advertisement, "id">): Promise<Advertisement> => {
+export const createAdvertisement = async (advertisementData: Omit<Advertisement, "id">): Promise<Advertisement> => {
   return prisma.advertisement.create({ data: advertisementData });
 };
 
@@ -17,6 +17,6 @@ export const deleteAdvertisement = async (id: number): Promise<void> => {
   await prisma.advertisement.delete({ where: { id } });
 };
 
-export const getAdveritsementsByUserId = async (userId: number): Promise<Advertisement[]> => {
+export const getAdvertisementsByUserId = async (userId: number): Promise<Advertisement[]> => {
   return prisma.advertisement.findMany({ where: { userId } });
 };
