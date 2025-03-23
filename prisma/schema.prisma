@@ -22,6 +22,8 @@ model User {
   locations       Location[]
   transactionsAsBuyer Transaction[] @relation("BuyerTransactions")
   transactionsAsSeller Transaction[] @relation("SellerTransactions")
+
+  RefreshToken RefreshToken[]
 }
 
 model Waste {
@@ -84,4 +86,12 @@ model Message {
   receiverId      Int
   sender          User      @relation("SentMessages", fields: [senderId], references: [id])
   receiver        User      @relation("ReceivedMessages", fields: [receiverId], references: [id])
+}
+
+model RefreshToken {
+  id        Int      @id @default(autoincrement())
+  token     String   @unique
+  userId    Int
+  expiresAt DateTime
+  user      User     @relation(fields: [userId], references: [id])
 }
